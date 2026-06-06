@@ -20,7 +20,7 @@ const Support = () => {
 
   React.useEffect(() => {
     if (isFirstRender.current) {
-      handleBotResponse("Hello! I'm your IIIT Buy-Sell assistant. How can I help you today?");
+      handleBotResponse("Hello! I'm your Loopify assistant. How can I help you today?");
       isFirstRender.current = false;
     }
   }, []);

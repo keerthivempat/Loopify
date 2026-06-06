@@ -66,7 +66,7 @@ const Login = () => {
                         type="email" 
                         className="form-control border-start-0 ps-0" 
                         name="email"
-                        placeholder="IIIT Email"
+                        placeholder="name@example.com"
                         value={formData.email}
                         onChange={handleChange}
                         required 

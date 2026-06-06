@@ -107,7 +107,7 @@ const Profile = () => {
                 <h2 className="profile-title">
                   {profile.firstName} {profile.lastName}
                 </h2>
-                <p className="profile-subtitle">IIIT Student</p>
+                <p className="profile-subtitle">Marketplace Member</p>
               </div>
 
               <div className="profile-content">

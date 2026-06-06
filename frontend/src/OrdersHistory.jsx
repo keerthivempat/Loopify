@@ -1,268 +1,254 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import Toast from './components/Toast';
+import SellerAcceptModal from './components/SellerAcceptModal';
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
-import { ShoppingBag, Clock, CheckCircle, RefreshCw, Package, DollarSign, User, FileText } from 'lucide-react';
+import {
+  MessageSquare, CheckCircle, XCircle,
+  User, FileText, Mail, Calendar, Phone, Clock,
+} from 'lucide-react';
 import 'react-tabs/style/react-tabs.css';
 import './OrdersHistory.css';
 
+const API = 'http://localhost:5000/api';
+const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
+const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+// ─── Status meta map (inquiries only) ───────────────────────────
+const INQ_STATUS = {
+  pending:  { label: '🟡 Pending',  cls: 'status-pending'  },
+  accepted: { label: '🟢 Accepted', cls: 'status-accepted' },
+  rejected: { label: '🔴 Rejected', cls: 'status-rejected' },
+};
+
+const StatusBadge = ({ status }) => {
+  const meta = INQ_STATUS[status] || INQ_STATUS.pending;
+  return <span className={`oh-status-badge ${meta.cls}`}>{meta.label}</span>;
+};
+
+// ─── Buyer Inquiry Card ──────────────────────────────────────────
+const BuyerInquiryCard = ({ inq }) => (
+  <div className="oh-card buyer-inquiry-card">
+    <div className="oh-card-header buyer-inq-header">
+      <MessageSquare size={18} />
+      <h5 className="oh-card-title">{inq.itemId?.name || 'Item Unavailable'}</h5>
+      <StatusBadge status={inq.status} map={INQ_STATUS} />
+    </div>
+    <div className="oh-card-body">
+      <div className="oh-detail"><User size={15} /><span><b>Seller:</b> {inq.sellerId?.firstName} {inq.sellerId?.lastName}</span></div>
+      <div className="oh-detail message-row"><FileText size={15} /><span><b>Your Message:</b> {inq.inquiryMessage}</span></div>
+      <div className="oh-detail"><Calendar size={15} /><span><b>Date:</b> {fmtDate(inq.createdAt)}</span></div>
+
+      {inq.status === 'accepted' && (
+        <div className="oh-seller-reply">
+          {inq.sellerReply && (
+            <div className="oh-reply-msg">
+              <MessageSquare size={14} />
+              <span><b>Seller Reply:</b> {inq.sellerReply}</span>
+            </div>
+          )}
+          {inq.sellerPhone && (
+            <div className="oh-reply-phone">
+              <Phone size={14} />
+              <span><b>Contact:</b> {inq.sellerPhone}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+// ─── Seller Inquiry Card ─────────────────────────────────────────
+const SellerInquiryCard = ({ inq, onAccept, onReject, actionLoading }) => {
+  const isPending = inq.status === 'pending';
+  return (
+    <div className="oh-card inquiry-card">
+      <div className="oh-card-header inquiry-header">
+        <MessageSquare size={18} />
+        <h5 className="oh-card-title">{inq.itemId?.name || 'Item Unavailable'}</h5>
+        <StatusBadge status={inq.status} map={INQ_STATUS} />
+      </div>
+      <div className="oh-card-body">
+        <div className="oh-detail"><User size={15} /><span><b>Buyer:</b> {inq.buyerName}</span></div>
+        <div className="oh-detail"><Mail size={15} /><span><b>Email:</b> {inq.buyerEmail}</span></div>
+        <div className="oh-detail message-row"><FileText size={15} /><span><b>Message:</b> {inq.inquiryMessage}</span></div>
+        <div className="oh-detail"><Calendar size={15} /><span><b>Date:</b> {fmtDate(inq.createdAt)}</span></div>
+        {inq.status === 'accepted' && inq.sellerPhone && (
+          <div className="oh-detail"><Phone size={15} /><span><b>Your Contact:</b> {inq.sellerPhone}</span></div>
+        )}
+      </div>
+      {isPending && (
+        <div className="oh-card-actions">
+          <button id={`accept-inq-${inq._id}`} className="oh-btn-accept"
+            onClick={() => onAccept(inq._id)} disabled={actionLoading === inq._id}>
+            {actionLoading === inq._id ? <span className="spinner-border spinner-border-sm" /> : <CheckCircle size={14} />}
+            Accept
+          </button>
+          <button id={`reject-inq-${inq._id}`} className="oh-btn-reject"
+            onClick={() => onReject(inq._id)} disabled={actionLoading === inq._id}>
+            {actionLoading === inq._id ? <span className="spinner-border spinner-border-sm" /> : <XCircle size={14} />}
+            Reject
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+
 const OrdersHistory = () => {
-    const [pendingOrders, setPendingOrders] = useState([]);
-    const [completedOrders, setCompletedOrders] = useState([]);
-    const [soldOrders, setSoldOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [regenerating, setRegenerating] = useState(false);
-    const navigate = useNavigate();
+  const [buyerInquiries,  setBuyerInquiries]  = useState([]);
+  const [sellerInquiries, setSellerInquiries] = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [toast,           setToast]           = useState({ show: false, message: '', type: 'success' });
+  const [actionLoading,   setActionLoading]   = useState(null);
+  const [acceptModal,     setAcceptModal]     = useState({ show: false, inquiryId: null });
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+  const navigate = useNavigate();
+  const showToast = (msg, type = 'success') => setToast({ show: true, message: msg, type });
+  const hideToast = () => setToast(t => ({ ...t, show: false }));
 
-    const fetchOrders = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                navigate('/login');
-                return;
-            }
-    
-            const buyerResponse = await axios.get('http://localhost:5000/api/orders/buyer', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // Include orders with their OTPs in pending orders
-            const pending = buyerResponse.data
-                .filter(order => order.status === 'pending')
-                .map(order => ({
-                    ...order,
-                    plainOtp: order.plainOtp // This will be populated from the backend
-                }));
-            const completed = buyerResponse.data.filter(order => order.status === 'completed');
-            
-            setPendingOrders(pending);
-            setCompletedOrders(completed);
-
-            const sellerResponse = await axios.get('http://localhost:5000/api/orders/seller', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
-            const completedSales = sellerResponse.data.filter(order => order.status === 'completed');
-            setSoldOrders(completedSales);
-            
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching orders:', error);
-            setError('Failed to fetch orders');
-            setLoading(false);
-        }
-    };
-
-    const regenerateOtp = async (orderId) => {
-        try {
-            setRegenerating(true);
-            const token = localStorage.getItem('token');
-            
-            const response = await axios.post(
-                `http://localhost:5000/api/orders/regenerate-otp/${orderId}`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` }}
-            );
-
-            // Update the OTP in the pending orders state
-            setPendingOrders(prevOrders => prevOrders.map(order => {
-                if (order._id === orderId) {
-                    return {
-                        ...order,
-                        plainOtp: response.data.plainOtp
-                    };
-                }
-                return order;
-            }));
-
-            alert('New OTP generated successfully!');
-        } catch (error) {
-            console.error('Error regenerating OTP:', error);
-            alert('Failed to regenerate OTP. Please try again.');
-        } finally {
-            setRegenerating(false);
-        }
-    };
-  const handleCompleteOrder = async (orderId) => {
+  const fetchAll = useCallback(async () => {
+    if (!localStorage.getItem('token')) { navigate('/auth'); return; }
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        'http://localhost:5000/api/orders/complete',
-        { orderId, otp },
-        { headers: { Authorization: `Bearer ${token}` }}
-      );
-      
-      setOtp('');
-      setSelectedOrder(null);
-      await fetchOrders(); // Refresh orders after completion
-    } catch (error) {
-      console.error('Error completing order:', error);
-      alert(error.response?.data?.message || 'Error completing order');
+      const [buyerInqRes, sellerInqRes] = await Promise.all([
+        axios.get(`${API}/inquiries/buyer`,  { headers: authHeader() }),
+        axios.get(`${API}/inquiries/seller`, { headers: authHeader() }),
+      ]);
+      setBuyerInquiries(buyerInqRes.data);
+      setSellerInquiries(sellerInqRes.data);
+    } catch {
+      showToast('Failed to load inquiries. Please refresh.', 'error');
+    } finally {
+      setLoading(false);
     }
+  }, [navigate]);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  const openAcceptModal = (inquiryId) => setAcceptModal({ show: true, inquiryId });
+
+  const handleAcceptInquirySuccess = (updatedInquiry) => {
+    setSellerInquiries(prev => prev.map(i => i._id === updatedInquiry._id ? updatedInquiry : i));
+    showToast('Inquiry accepted! Buyer can now see your contact details.');
   };
+
+  const handleRejectInquiry = async (id) => {
+    try {
+      setActionLoading(id);
+      await axios.patch(`${API}/inquiries/${id}/reject`, {}, { headers: authHeader() });
+      setSellerInquiries(prev => prev.map(i => i._id === id ? { ...i, status: 'rejected' } : i));
+      showToast('Inquiry rejected.');
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to reject inquiry', 'error');
+    } finally { setActionLoading(null); }
+  };
+
+  const sortByStatus = (arr) =>
+    [...arr].sort((a, b) => {
+      const rank = { pending: 0, accepted: 1, rejected: 2 };
+      return (rank[a.status] ?? 9) - (rank[b.status] ?? 9);
+    });
+
+  const pendingCount = [
+    ...buyerInquiries,
+    ...sellerInquiries,
+  ].filter(i => i.status === 'pending').length;
+
   if (loading) return (
     <div>
-        <Navbar />
-        <div className="loading-container">
-            <div className="spinner">
-                <ShoppingBag className="loading-icon" size={40} />
-            </div>
-            <p className="loading-text">Loading your orders...</p>
+      <Navbar />
+      <div className="loading-container">
+        <div className="oh-spinner-wrap">
+          <MessageSquare className="loading-icon" size={40} />
         </div>
+        <p className="loading-text">Loading your inquiries…</p>
+      </div>
     </div>
-);
+  );
 
-if (error) return (
+  return (
     <div>
-        <Navbar />
-        <div className="error-container">
-            <div className="alert alert-danger fade-in">
-                <h4>Error</h4>
-                <p>{error}</p>
-            </div>
-        </div>
-    </div>
-);
+      <Navbar />
+      <Toast show={toast.show} message={toast.message} type={toast.type} onClose={hideToast} />
+      <SellerAcceptModal
+        show={acceptModal.show}
+        inquiryId={acceptModal.inquiryId}
+        onClose={() => setAcceptModal({ show: false, inquiryId: null })}
+        onSuccess={handleAcceptInquirySuccess}
+        onError={(msg) => showToast(msg, 'error')}
+      />
 
-const OrderCard = ({ order, isPending = false, isSale = false }) => (
-    <div className="order-card">
-        <div className="order-header">
-            <div className="order-icon">
-                {isPending ? <Clock /> : <CheckCircle />}
-            </div>
-            <h5 className="order-title">{order.itemId?.name || 'Product Unavailable'}</h5>
+      <div className="orders-container">
+        <div className="orders-header">
+          <MessageSquare className="header-icon" />
+          <h2>Inquiries</h2>
         </div>
-        
-        <div className="order-details">
-            <div className="detail-item">
-                <DollarSign size={18} />
-                <span>₹{order.itemId?.price || 0} × {order.quantity}</span>
-            </div>
-            
-            <div className="detail-item">
-                <Package size={18} />
-                <span>Total: ₹{(order.itemId?.price || 0) * order.quantity}</span>
-            </div>
-            
-            <div className="detail-item">
-                <User size={18} />
-                <span>
-                    {isSale ? 'Buyer: ' : 'Seller: '}
-                    {isSale 
-                        ? `${order.buyerId?.firstName} ${order.buyerId?.lastName}`
-                        : `${order.sellerId?.firstName} ${order.sellerId?.lastName}`
-                    }
-                </span>
-            </div>
-            
-            <div className="detail-item">
-                <FileText size={18} />
-                <span>ID: {order._id}</span>
-            </div>
 
-            {isPending && (
-                <div className="otp-section">
-                    <div className="otp-content">
-                        <h6>Transaction OTP</h6>
-                        <div className="otp-display">{order.plainOtp}</div>
-                        <small>Share this OTP with the seller</small>
-                    </div>
-                    <button 
-                        className="btn btn-outline-primary btn-regenerate"
-                        onClick={() => regenerateOtp(order._id)}
-                        disabled={regenerating}
-                    >
-                        <RefreshCw size={16} className={regenerating ? 'spin' : ''} />
-                        {regenerating ? 'Regenerating...' : 'Regenerate OTP'}
-                    </button>
+        <Tabs className="custom-tabs">
+          <TabList>
+            <Tab id="tab-pending-orders">
+              <Clock size={17} />
+              <span>Pending Orders</span>
+              {pendingCount > 0 && <span className="badge badge-alert">{pendingCount}</span>}
+            </Tab>
+          </TabList>
+
+          {/* ══ Pending Orders: buyer sent + seller received ══ */}
+          <TabPanel>
+            <div className="pending-orders-panel">
+
+              {/* My Sent Inquiries (buyer view) */}
+              <div className="oh-section-heading">
+                <MessageSquare size={16} /> My Sent Inquiries
+                <span className="oh-section-count">{buyerInquiries.length}</span>
+              </div>
+              {buyerInquiries.length === 0 ? (
+                <div className="no-orders small-empty">
+                  <MessageSquare size={30} />
+                  <p>You haven't sent any inquiries yet</p>
                 </div>
-            )}
-        </div>
-    </div>
-);
+              ) : (
+                <div className="inquiries-grid">
+                  {sortByStatus(buyerInquiries).map(inq => (
+                    <BuyerInquiryCard key={inq._id} inq={inq} />
+                  ))}
+                </div>
+              )}
 
-return (
-    <div>
-        <Navbar />
-        <div className="orders-container">
-            <div className="orders-header">
-                <ShoppingBag className="header-icon" />
-                <h2>Orders History</h2>
+              {/* Received Inquiries (seller view) */}
+              <div className="oh-section-heading" style={{ marginTop: '2rem' }}>
+                <Mail size={16} /> Received Inquiries
+                <span className="oh-section-count">{sellerInquiries.length}</span>
+              </div>
+              {sellerInquiries.length === 0 ? (
+                <div className="no-orders small-empty">
+                  <Mail size={30} />
+                  <p>No inquiries received yet</p>
+                </div>
+              ) : (
+                <div className="inquiries-grid">
+                  {sortByStatus(sellerInquiries).map(inq => (
+                    <SellerInquiryCard
+                      key={inq._id}
+                      inq={inq}
+                      onAccept={openAcceptModal}
+                      onReject={handleRejectInquiry}
+                      actionLoading={actionLoading}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-            
-            <Tabs className="custom-tabs">
-                <TabList>
-                    <Tab>
-                        <Clock size={18} />
-                        <span>Pending Orders</span>
-                        <span className="badge">{pendingOrders.length}</span>
-                    </Tab>
-                    <Tab>
-                        <ShoppingBag size={18} />
-                        <span>Purchase History</span>
-                        <span className="badge">{completedOrders.length}</span>
-                    </Tab>
-                    <Tab>
-                        <DollarSign size={18} />
-                        <span>Sales History</span>
-                        <span className="badge">{soldOrders.length}</span>
-                    </Tab>
-                </TabList>
-
-                <TabPanel>
-                    <div className="orders-grid">
-                        {pendingOrders.length === 0 ? (
-                            <div className="no-orders">
-                                <Clock size={40} />
-                                <p>No pending orders</p>
-                            </div>
-                        ) : (
-                            pendingOrders.map(order => (
-                                <OrderCard key={order._id} order={order} isPending={true} />
-                            ))
-                        )}
-                    </div>
-                </TabPanel>
-
-                <TabPanel>
-                    <div className="orders-grid">
-                        {completedOrders.length === 0 ? (
-                            <div className="no-orders">
-                                <ShoppingBag size={40} />
-                                <p>No purchase history</p>
-                            </div>
-                        ) : (
-                            completedOrders.map(order => (
-                                <OrderCard key={order._id} order={order} />
-                            ))
-                        )}
-                    </div>
-                </TabPanel>
-
-                <TabPanel>
-                    <div className="orders-grid">
-                        {soldOrders.length === 0 ? (
-                            <div className="no-orders">
-                                <DollarSign size={40} />
-                                <p>No sales history</p>
-                            </div>
-                        ) : (
-                            soldOrders.map(order => (
-                                <OrderCard key={order._id} order={order} isSale={true} />
-                            ))
-                        )}
-                    </div>
-                </TabPanel>
-            </Tabs>
-        </div>
+          </TabPanel>
+        </Tabs>
+      </div>
     </div>
-);
+  );
 };
 
 export default OrdersHistory;

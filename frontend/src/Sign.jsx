@@ -35,11 +35,6 @@ const Sign = () => {
       return;
     }
 
-    if (!formData.email.endsWith('@iiit.ac.in')) {
-      alert('Only IIIT email addresses are allowed');
-      return;
-    }
-
     try {
       const response = await axios.post('http://localhost:5000/api/register', {
         firstName: formData.firstName,
@@ -114,12 +109,12 @@ const Sign = () => {
                       className="form-control"
                       id="email"
                       name="email"
-                      placeholder="name@iiit.ac.in"
+                      placeholder="name@example.com"
                       value={formData.email}
                       onChange={handleChange}
                       required
                     />
-                    <label htmlFor="email">IIIT Email Address</label>
+                    <label htmlFor="email">Email Address</label>
                   </div>
 
                   <div className="row g-3">

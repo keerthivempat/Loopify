@@ -6,13 +6,17 @@ import Sign from './Sign';
 import Login from './Login';
 import Profile from './Profile';
 import Auth from './Auth';
-import SearchItems from './SearchItems';
+import BrowseListings from './BrowseListings';
+import MyListings from './MyListings';
+import CreateListing from './CreateListing';
+import EditListing from './EditListing';
+import Wishlist from './Wishlist';
 import ItemDetails from './ItemDetails';
 import MyCart from './MyCart';
 import DeliverItems from './DeliverItems';
 import OrdersHistory from './OrdersHistory';
 import Support from './Support';
-// Protected Route Component
+
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/auth" replace />;
@@ -25,65 +29,99 @@ function App() {
         <Route path="/" element={<Sign />} />
         <Route path="/register" element={<Sign />} />
         <Route path="/login" element={<Login />} />
-        <Route 
-            path="/cart" 
-            element={
-              <ProtectedRoute>
-                <MyCart />
-              </ProtectedRoute>
-            } 
-          />
-        <Route 
-            path="/orders-history" 
-            element={
-              <ProtectedRoute>
-                <OrdersHistory />
-              </ProtectedRoute>
-            } 
-          />
-        <Route 
-            path="/deliver-items" 
-            element={
-              <ProtectedRoute>
-                <DeliverItems />
-              </ProtectedRoute>
-            } 
-          />
-        <Route 
-            path="/items/:id" 
-            element={
-              <ProtectedRoute>
-                <ItemDetails />
-              </ProtectedRoute>
-            } 
-          />
-        <Route 
-            path="/support" 
-            element={
-              <ProtectedRoute>
-                <Support />
-              </ProtectedRoute>
-            } 
-          />
-
-        <Route 
-          path="/profile" 
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <MyCart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders-history"
+          element={
+            <ProtectedRoute>
+              <OrdersHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/deliver-items"
+          element={
+            <ProtectedRoute>
+              <DeliverItems />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/items/:id"
+          element={
+            <ProtectedRoute>
+              <ItemDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <ProtectedRoute>
+              <Support />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
           element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/search-items" 
+        <Route
+          path="/browse-listings"
           element={
             <ProtectedRoute>
-              <SearchItems />
+              <BrowseListings />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/search-items"
+          element={<Navigate to="/browse-listings" replace />}
+        />
+        <Route
+          path="/my-listings"
+          element={
+            <ProtectedRoute>
+              <MyListings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-listings/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-listing"
+          element={
+            <ProtectedRoute>
+              <CreateListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
         />
         <Route path="/auth" element={<Auth />} />
-        {/* Catch-all route to redirect to auth page */}
         <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
     </Router>

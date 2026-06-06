@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Truck, ShoppingCart, User, LogOut, Store } from 'lucide-react';
+import { Search, List, Heart, ShoppingBag, User, LogOut, Store } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Navbar.css';
 
@@ -16,23 +16,29 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { path: "/search-items", label: "Search Items", icon: Search },
-    { path: "/orders-history", label: "Orders History", icon: ShoppingBag },
-    { path: "/deliver-items", label: "Deliver Items", icon: Truck },
-    { path: "/cart", label: "My Cart", icon: ShoppingCart },
-    { path: "/profile", label: "Profile", icon: User },
-    { path: "/support", label: "Support", icon: User },
+    { path: '/browse-listings', label: 'Browse Listings', icon: Search },
+    { path: '/my-listings', label: 'My Listings', icon: List },
+    { path: '/wishlist', label: 'Wishlist', icon: Heart },
+    { path: '/orders-history', label: 'Orders', icon: ShoppingBag },
+    { path: '/profile', label: 'Profile', icon: User },
   ];
+
+  const isActive = (path) => {
+    if (path === '/browse-listings') {
+      return location.pathname === '/browse-listings' || location.pathname === '/search-items';
+    }
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   return (
     <nav className="navbar navbar-expand-lg custom-navbar">
       <div className="container">
-        <Link className="navbar-brand brand-text" to="/search-items">
+        <Link className="navbar-brand brand-text" to="/browse-listings">
           <Store className="brand-icon me-2" size={28} />
-          <span>Buy, Sell @ IIITH</span>
+          <span>Loopify</span>
         </Link>
-        
-        <button 
+
+        <button
           className="navbar-toggler"
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -46,8 +52,8 @@ const Navbar = () => {
               const Icon = item.icon;
               return (
                 <li key={item.path} className="nav-item">
-                  <Link 
-                    className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
+                  <Link
+                    className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
                     to={item.path}
                   >
                     <Icon className="nav-icon" size={20} />
@@ -56,12 +62,9 @@ const Navbar = () => {
                 </li>
               );
             })}
-            
+
             <li className="nav-item ms-2">
-              <button 
-                className="btn btn-logout"
-                onClick={handleLogout}
-              >
+              <button className="btn btn-logout" onClick={handleLogout}>
                 <LogOut size={20} />
                 <span>Logout</span>
               </button>

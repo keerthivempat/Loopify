@@ -1,228 +1,523 @@
-/* OrdersHistory.css */
+/* ═══════════════════════════════════════════════════════════════
+   OrdersHistory.css  —  Loopify marketplace orders & inquiries
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page container ──────────────────────────────────────────── */
 .orders-container {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    animation: fadeIn 0.5s ease;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease;
 }
 
 .orders-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.orders-header h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e1e2e;
 }
 
 .header-icon {
-    color: #9E7BFF;
-    animation: bounce 2s infinite;
+  color: #9E7BFF;
+  animation: bounce 2.5s infinite;
 }
 
+/* ── Loading & error states ──────────────────────────────────── */
 .loading-container {
-    height: 70vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.spinner {
-    margin-bottom: 1rem;
+.oh-spinner-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loading-icon {
-    animation: spin 1.5s linear infinite;
-    color: #9E7BFF;
+  animation: spin 1.5s linear infinite;
+  color: #9E7BFF;
 }
 
 .loading-text {
-    color: #6c757d;
-    font-size: 1.1rem;
+  color: #6c757d;
+  font-size: 1.05rem;
 }
 
-/* Custom Tabs Styling */
+.error-container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── react-tabs customization ────────────────────────────────── */
 .custom-tabs {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 1.25rem 1rem 1.5rem;
 }
 
 .react-tabs__tab-list {
-    border: none;
-    display: flex;
-    gap: 1rem;
-    padding: 0 1rem;
-    margin-bottom: 1.5rem;
+  border: none;
+  display: flex;
+  gap: 0.6rem;
+  padding: 0 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .react-tabs__tab {
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #6c757d;
-    transition: all 0.3s ease;
+  border: 1.5px solid #e8e4f8;
+  padding: 0.6rem 1.1rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafafa;
+}
+
+.react-tabs__tab:hover {
+  background: #f0eeff;
+  color: #7c4dff;
+  border-color: #c5b8ff;
 }
 
 .react-tabs__tab svg {
-    transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
 }
 
 .react-tabs__tab:hover svg {
-    transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .react-tabs__tab--selected {
-    background: #FC8EAC !important;
-    color: white !important;
+  background: linear-gradient(135deg, #9E7BFF 0%, #7c4dff 100%) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35);
 }
 
+/* tab count badge */
 .badge {
-    background: rgba(0, 0, 0, 0.1);
-    padding: 0.25rem 0.5rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    margin-left: 0.5rem;
+  background: rgba(0, 0, 0, 0.12);
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
 }
 
-/* Order Cards Grid */
-.orders-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 1rem;
+.badge-inquiry {
+  background: rgba(255, 255, 255, 0.28) !important;
+  color: #fff !important;
 }
 
-.order-card {
-    background: rgb(199, 250, 250);
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    animation: slideIn 0.5s ease;
+.react-tabs__tab:not(.react-tabs__tab--selected) .badge-inquiry {
+  background: rgba(158, 123, 255, 0.18) !important;
+  color: #7c4dff !important;
 }
 
-.order-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.order-header {
-    background: linear-gradient(135deg, #FC8EAC 0%, #ff7fa1 100%);
-    color: white;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.order-icon {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.5rem;
-    border-radius: 8px;
-}
-
-.order-title {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.order-details {
-    padding: 1rem;
-}
-
-.detail-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    color: #495057;
-}
-
-.detail-item svg {
-    color: #FC8EAC;
-}
-
-.otp-section {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.otp-display {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #FC8EAC;
-    margin: 0.5rem 0;
-}
-
-.btn-regenerate {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+/* ── Grid layouts ────────────────────────────────────────────── */
+.orders-grid,
+.inquiries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.4rem;
+  padding: 0.5rem;
 }
 
 .no-orders {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 3rem;
-    color: #6c757d;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3.5rem 1rem;
+  color: #aaa;
 }
 
 .no-orders svg {
-    margin-bottom: 1rem;
-    opacity: 0.5;
+  margin-bottom: 1rem;
+  opacity: 0.4;
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.no-orders p {
+  font-size: 1rem;
+  margin: 0;
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ── Shared card shell ───────────────────────────────────────── */
+.oh-card {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  background: #fff;
+  border: 1px solid #f0eeff;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  animation: slideIn 0.38s ease;
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+.oh-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(124, 77, 255, 0.13);
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+.oh-card-header {
+  padding: 0.95rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #fff;
+  flex-wrap: wrap;
 }
 
-.spin {
-    animation: spin 1s linear infinite;
+.oh-card-title {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Responsive Design */
+.oh-card-body {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.oh-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.875rem;
+  color: #444;
+  line-height: 1.45;
+}
+
+.oh-detail svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.75;
+}
+
+.message-row span {
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.oh-id {
+  font-size: 0.75rem;
+  color: #999;
+  word-break: break-all;
+}
+
+/* ── Card header colours ─────────────────────────────────────── */
+.inquiry-header  { background: linear-gradient(135deg, #9E7BFF 0%, #7c4dff 100%); }
+.purchase-header { background: linear-gradient(135deg, #FC8EAC 0%, #e05c84 100%); }
+.sales-header    { background: linear-gradient(135deg, #43c6ac 0%, #2da88f 100%); }
+
+/* ── Status Badges ───────────────────────────────────────────── */
+.oh-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* In header (white bg) */
+.oh-card-header .oh-status-badge {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* Standalone status colours (used outside headers if needed) */
+.status-pending          { background: #fff8e1; color: #b07d00; border: 1px solid #f0c040; }
+.status-accepted         { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.status-rejected         { background: #fde8ee; color: #c0274a; border: 1px solid #f9b8c8; }
+.status-handover         { background: #e8eaf6; color: #3949ab; border: 1px solid #9fa8da; }
+.status-completed        { background: #e0f7ea; color: #1a6e52; border: 1px solid #a7ecd6; }
+
+/* ── OTP section (buyer) ─────────────────────────────────────── */
+.oh-otp-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, #fdf6ff, #f3eeff);
+  border-radius: 10px;
+  border: 1px dashed #c4b0ff;
+}
+
+.oh-otp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.oh-otp-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7c4dff;
+  margin: 0;
+}
+
+.oh-otp-code {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  color: #5c35cc;
+  font-family: 'Courier New', monospace;
+}
+
+.oh-otp-info small {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.oh-btn-regen {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border: 1.5px solid #9E7BFF;
+  border-radius: 8px;
+  background: transparent;
+  color: #7c4dff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.oh-btn-regen:hover:not(:disabled) {
+  background: #7c4dff;
+  color: #fff;
+}
+
+.oh-btn-regen:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── OTP verify (seller) ─────────────────────────────────────── */
+.oh-otp-verify {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #f0f7ff;
+  border-radius: 10px;
+  border: 1px dashed #90caf9;
+}
+
+.oh-otp-verify .oh-otp-label {
+  color: #1565c0;
+  margin-bottom: 0.5rem;
+}
+
+.oh-otp-input-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.oh-otp-input {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid #90caf9;
+  border-radius: 8px;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  font-family: 'Courier New', monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.oh-otp-input:focus {
+  border-color: #1976d2;
+}
+
+.oh-btn-complete {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(135deg, #43c6ac, #2da88f);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.oh-btn-complete:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.oh-btn-complete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Accept / Reject buttons (shared) ────────────────────────── */
+.oh-card-actions {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.85rem 1.1rem 1rem;
+  border-top: 1px solid #f0eeff;
+}
+
+.oh-btn-accept,
+.oh-btn-reject {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.52rem 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.oh-btn-accept { background: linear-gradient(135deg, #43c6ac 0%, #2da88f 100%); color: #fff; }
+.oh-btn-reject { background: linear-gradient(135deg, #ff6b8a 0%, #e84a6e 100%); color: #fff; }
+
+.oh-btn-accept:hover:not(:disabled),
+.oh-btn-reject:hover:not(:disabled) {
+  opacity: 0.87;
+  transform: scale(1.02);
+}
+
+.oh-btn-accept:disabled,
+.oh-btn-reject:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+/* ── Card header colours ─────────────────────────────────────── */
+.buyer-inq-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+
+/* ── Buyer inquiry — seller reply block ──────────────────────── */
+.oh-seller-reply {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, #f0fff4, #e8f5e9);
+  border-radius: 10px;
+  border: 1px solid #a5d6a7;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.oh-reply-msg,
+.oh-reply-phone {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #2e7d32;
+}
+
+.oh-reply-msg svg,
+.oh-reply-phone svg { flex-shrink: 0; margin-top: 2px; }
+
+.oh-reply-phone { font-weight: 600; font-size: 0.95rem; }
+
+/* ── Pending Orders panel layout ─────────────────────────────── */
+.pending-orders-panel { padding: 0.5rem; }
+
+.oh-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #444;
+  padding: 0.4rem 0.25rem 0.75rem;
+  border-bottom: 2px solid #f0eeff;
+  margin-bottom: 1rem;
+}
+
+.oh-section-count {
+  background: #9E7BFF;
+  color: #fff;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+.small-empty {
+  padding: 1.5rem 1rem !important;
+}
+
+/* ── Alert badge (active count) ──────────────────────────────── */
+.badge-alert {
+  background: #ff5252 !important;
+  color: #fff !important;
+}
+
+.react-tabs__tab--selected .badge-alert {
+  background: rgba(255,255,255,0.3) !important;
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes bounce  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+.spin { animation: spin 0.9s linear infinite; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .orders-container {
-        padding: 1rem;
-    }
+  .orders-container { padding: 1rem; }
 
-    .react-tabs__tab-list {
-        flex-direction: column;
-    }
+  .react-tabs__tab-list { flex-direction: column; gap: 0.4rem; }
 
-    .react-tabs__tab {
-        width: 100%;
-        justify-content: center;
-    }
+  .react-tabs__tab { width: 100%; justify-content: flex-start; }
+
+  .oh-otp-section { flex-direction: column; align-items: flex-start; }
+
+  .oh-otp-input-row { flex-direction: column; }
+
+  .oh-btn-complete { width: 100%; justify-content: center; }
+
+  .orders-grid,
+  .inquiries-grid { grid-template-columns: 1fr; }
 }
