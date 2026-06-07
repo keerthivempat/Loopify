@@ -25,7 +25,7 @@ connectDB();
 
 const app = express();
 
-apapp.use(cors({
+app.use(cors({
   origin: true,
   credentials: true
 }));  
