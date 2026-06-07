@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import Navbar from './Navbar';
 import ListingForm from './components/ListingForm';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Toast from './components/Toast';
+import { API_BASE, getAuthHeaders } from './utils/api';
+import './CreateListing.css';
 
 const EditListing = () => {
   const { id } = useParams();
-  const [item, setItem] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [item,        setItem]        = useState(null);
+  const [isLoading,   setIsLoading]   = useState(true);
+  const [isSubmitting,setIsSubmitting]= useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const navigate = useNavigate();
+
+  const showToast = (msg, type = 'success') => setToast({ show: true, message: msg, type });
+  const hideToast = () => setToast(t => ({ ...t, show: false }));
 
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/items/${id}`);
-        setItem(response.data);
-      } catch (error) {
-        alert('Listing not found');
-        navigate('/my-listings');
+        const res = await axios.get(`${API_BASE}/items/${id}`);
+        setItem(res.data);
+      } catch {
+        showToast('Listing not found', 'error');
+        setTimeout(() => navigate('/my-listings'), 1500);
       } finally {
         setIsLoading(false);
       }
@@ -28,53 +35,47 @@ const EditListing = () => {
   }, [id, navigate]);
 
   const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
-      const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/items/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await axios.put(`${API_BASE}/items/${id}`, formData, { headers: getAuthHeaders() });
       navigate('/my-listings');
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update listing');
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to update listing', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-vh-100 d-flex justify-content-center align-items-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-vh-100 bg-light">
+    <div className="lp-page">
       <Navbar />
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-6">
-            <div className="card border-0 shadow-lg">
-              <div className="card-header bg-white border-0 text-center pt-4">
-                <h2 className="text-primary fw-bold mb-2">Edit Listing</h2>
-                <p className="text-muted">Update your listing details</p>
+      <Toast show={toast.show} message={toast.message} type={toast.type} onClose={hideToast} />
+
+      <div className="cl-container">
+        <Link to="/my-listings" className="cl-back">
+          <ArrowLeft size={16} /> My Listings
+        </Link>
+
+        <div className="cl-card lp-card">
+          <div className="cl-card-header">
+            <h2 className="cl-title">Edit Listing</h2>
+            <p className="cl-sub">Update your listing details</p>
+          </div>
+          <div className="cl-card-body">
+            {isLoading ? (
+              <div className="cl-skeleton">
+                {[100, 80, 60, 100, 50].map((w, i) => (
+                  <div key={i} className="skeleton cl-skeleton-line" style={{ width: `${w}%` }} />
+                ))}
               </div>
-              <div className="card-body px-4 pb-5">
-                <ListingForm
-                  initialData={item}
-                  onSubmit={handleSubmit}
-                  submitLabel="Save Changes"
-                  isSubmitting={isSubmitting}
-                />
-              </div>
-            </div>
+            ) : item ? (
+              <ListingForm
+                initialData={item}
+                onSubmit={handleSubmit}
+                submitLabel="Save Changes"
+                isSubmitting={isSubmitting}
+              />
+            ) : null}
           </div>
         </div>
       </div>

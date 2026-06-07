@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
    OrdersHistory.css  —  Loopify marketplace orders & inquiries
+   Uses global design-system tokens from index.css
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Page container ──────────────────────────────────────────── */
@@ -21,11 +22,11 @@
   margin: 0;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1e1e2e;
+  color: var(--lp-black);
 }
 
 .header-icon {
-  color: #9E7BFF;
+  color: var(--lp-accent);
   animation: bounce 2.5s infinite;
 }
 
@@ -47,11 +48,11 @@
 
 .loading-icon {
   animation: spin 1.5s linear infinite;
-  color: #9E7BFF;
+  color: var(--lp-accent);
 }
 
 .loading-text {
-  color: #6c757d;
+  color: var(--lp-muted);
   font-size: 1.05rem;
 }
 
@@ -63,9 +64,10 @@
 
 /* ── react-tabs customization ────────────────────────────────── */
 .custom-tabs {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  background: var(--lp-surface);
+  border-radius: var(--lp-radius-lg);
+  box-shadow: var(--lp-shadow);
+  border: 1px solid var(--lp-border);
   padding: 1.25rem 1rem 1.5rem;
 }
 
@@ -79,24 +81,24 @@
 }
 
 .react-tabs__tab {
-  border: 1.5px solid #e8e4f8;
+  border: 1.5px solid var(--lp-border);
   padding: 0.6rem 1.1rem;
-  border-radius: 10px;
+  border-radius: var(--lp-radius);
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  color: #6c757d;
+  color: var(--lp-muted);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: #fafafa;
+  transition: var(--lp-transition);
+  background: var(--lp-bg);
 }
 
 .react-tabs__tab:hover {
-  background: #f0eeff;
-  color: #7c4dff;
-  border-color: #c5b8ff;
+  background: var(--lp-accent-lt);
+  color: var(--lp-accent);
+  border-color: var(--lp-accent);
 }
 
 .react-tabs__tab svg {
@@ -108,17 +110,17 @@
 }
 
 .react-tabs__tab--selected {
-  background: linear-gradient(135deg, #9E7BFF 0%, #7c4dff 100%) !important;
-  color: #fff !important;
+  background: var(--lp-accent) !important;
+  color: var(--lp-white) !important;
   border-color: transparent !important;
-  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(194, 65, 12, 0.3);
 }
 
 /* tab count badge */
 .badge {
   background: rgba(0, 0, 0, 0.12);
   padding: 0.18rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--lp-radius-full);
   font-size: 0.7rem;
   font-weight: 700;
   margin-left: 0.25rem;
@@ -126,12 +128,12 @@
 
 .badge-inquiry {
   background: rgba(255, 255, 255, 0.28) !important;
-  color: #fff !important;
+  color: var(--lp-white) !important;
 }
 
 .react-tabs__tab:not(.react-tabs__tab--selected) .badge-inquiry {
-  background: rgba(158, 123, 255, 0.18) !important;
-  color: #7c4dff !important;
+  background: var(--lp-accent-lt) !important;
+  color: var(--lp-accent) !important;
 }
 
 /* ── Grid layouts ────────────────────────────────────────────── */
@@ -147,7 +149,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 3.5rem 1rem;
-  color: #aaa;
+  color: var(--lp-muted-lt);
 }
 
 .no-orders svg {
@@ -162,18 +164,18 @@
 
 /* ── Shared card shell ───────────────────────────────────────── */
 .oh-card {
-  border-radius: 14px;
+  border-radius: var(--lp-radius-lg);
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
-  background: #fff;
-  border: 1px solid #f0eeff;
+  box-shadow: var(--lp-shadow-sm);
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
   transition: transform 0.22s ease, box-shadow 0.22s ease;
   animation: slideIn 0.38s ease;
 }
 
 .oh-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(124, 77, 255, 0.13);
+  box-shadow: 0 10px 28px rgba(194, 65, 12, 0.12);
 }
 
 .oh-card-header {
@@ -181,7 +183,7 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  color: #fff;
+  color: var(--lp-white);
   flex-wrap: wrap;
 }
 
@@ -207,14 +209,15 @@
   align-items: flex-start;
   gap: 0.55rem;
   font-size: 0.875rem;
-  color: #444;
+  color: var(--lp-black);
   line-height: 1.45;
 }
 
 .oh-detail svg {
   flex-shrink: 0;
   margin-top: 2px;
-  opacity: 0.75;
+  opacity: 0.6;
+  color: var(--lp-accent);
 }
 
 .message-row span {
@@ -224,14 +227,29 @@
 
 .oh-id {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--lp-muted-lt);
   word-break: break-all;
 }
 
 /* ── Card header colours ─────────────────────────────────────── */
-.inquiry-header  { background: linear-gradient(135deg, #9E7BFF 0%, #7c4dff 100%); }
-.purchase-header { background: linear-gradient(135deg, #FC8EAC 0%, #e05c84 100%); }
-.sales-header    { background: linear-gradient(135deg, #43c6ac 0%, #2da88f 100%); }
+/* Seller received inquiry — primary accent */
+.inquiry-header {
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
+}
+
+/* Buyer sent inquiry — a complementary warm tone */
+.buyer-inq-header {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+}
+
+/* Purchase / sales headers (kept for future use) */
+.purchase-header {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+}
+
+.sales-header {
+  background: linear-gradient(135deg, var(--lp-success) 0%, #15803D 100%);
+}
 
 /* ── Status Badges ───────────────────────────────────────────── */
 .oh-status-badge {
@@ -239,7 +257,7 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.2rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--lp-radius-full);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -248,19 +266,19 @@
   flex-shrink: 0;
 }
 
-/* In header (white bg) */
+/* Inside a coloured card header — stay white */
 .oh-card-header .oh-status-badge {
-  background: rgba(255,255,255,0.22);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--lp-white);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-/* Standalone status colours (used outside headers if needed) */
-.status-pending          { background: #fff8e1; color: #b07d00; border: 1px solid #f0c040; }
-.status-accepted         { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-.status-rejected         { background: #fde8ee; color: #c0274a; border: 1px solid #f9b8c8; }
-.status-handover         { background: #e8eaf6; color: #3949ab; border: 1px solid #9fa8da; }
-.status-completed        { background: #e0f7ea; color: #1a6e52; border: 1px solid #a7ecd6; }
+/* Standalone status colours */
+.status-pending  { background: #FEF3EE; color: var(--lp-accent);      border: 1px solid #FDBA74; }
+.status-accepted { background: #DCFCE7; color: var(--lp-success);     border: 1px solid #86EFAC; }
+.status-rejected { background: #FEE2E2; color: var(--lp-error);       border: 1px solid #FCA5A5; }
+.status-handover { background: #EFF6FF; color: #1D4ED8;               border: 1px solid #BFDBFE; }
+.status-completed{ background: #F0FDF4; color: #15803D;               border: 1px solid #BBF7D0; }
 
 /* ── OTP section (buyer) ─────────────────────────────────────── */
 .oh-otp-section {
@@ -270,9 +288,9 @@
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, #fdf6ff, #f3eeff);
-  border-radius: 10px;
-  border: 1px dashed #c4b0ff;
+  background: var(--lp-accent-lt);
+  border-radius: var(--lp-radius);
+  border: 1px dashed var(--lp-accent);
 }
 
 .oh-otp-info {
@@ -284,7 +302,7 @@
 .oh-otp-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #7c4dff;
+  color: var(--lp-accent);
   margin: 0;
 }
 
@@ -292,13 +310,13 @@
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: 0.25em;
-  color: #5c35cc;
+  color: var(--lp-accent-dark);
   font-family: 'Courier New', monospace;
 }
 
 .oh-otp-info small {
   font-size: 0.7rem;
-  color: #999;
+  color: var(--lp-muted);
 }
 
 .oh-btn-regen {
@@ -306,21 +324,21 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 0.85rem;
-  border: 1.5px solid #9E7BFF;
-  border-radius: 8px;
+  border: 1.5px solid var(--lp-accent);
+  border-radius: var(--lp-radius);
   background: transparent;
-  color: #7c4dff;
+  color: var(--lp-accent);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: var(--lp-transition);
   flex-shrink: 0;
 }
 
 .oh-btn-regen:hover:not(:disabled) {
-  background: #7c4dff;
-  color: #fff;
+  background: var(--lp-accent);
+  color: var(--lp-white);
 }
 
 .oh-btn-regen:disabled {
@@ -332,13 +350,13 @@
 .oh-otp-verify {
   margin-top: 0.75rem;
   padding: 0.85rem 1rem;
-  background: #f0f7ff;
-  border-radius: 10px;
-  border: 1px dashed #90caf9;
+  background: #EFF6FF;
+  border-radius: var(--lp-radius);
+  border: 1px dashed #93C5FD;
 }
 
 .oh-otp-verify .oh-otp-label {
-  color: #1565c0;
+  color: #1D4ED8;
   margin-bottom: 0.5rem;
 }
 
@@ -350,8 +368,8 @@
 .oh-otp-input {
   flex: 1;
   padding: 0.55rem 0.75rem;
-  border: 1.5px solid #90caf9;
-  border-radius: 8px;
+  border: 1.5px solid #93C5FD;
+  border-radius: var(--lp-radius);
   font-size: 1rem;
   letter-spacing: 0.2em;
   font-family: 'Courier New', monospace;
@@ -360,7 +378,7 @@
 }
 
 .oh-otp-input:focus {
-  border-color: #1976d2;
+  border-color: #1D4ED8;
 }
 
 .oh-btn-complete {
@@ -368,10 +386,10 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.55rem 1rem;
-  background: linear-gradient(135deg, #43c6ac, #2da88f);
-  color: #fff;
+  background: linear-gradient(135deg, var(--lp-success) 0%, #15803D 100%);
+  color: var(--lp-white);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--lp-radius);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -389,12 +407,12 @@
   cursor: not-allowed;
 }
 
-/* ── Accept / Reject buttons (shared) ────────────────────────── */
+/* ── Accept / Reject buttons ─────────────────────────────────── */
 .oh-card-actions {
   display: flex;
   gap: 0.65rem;
   padding: 0.85rem 1.1rem 1rem;
-  border-top: 1px solid #f0eeff;
+  border-top: 1px solid var(--lp-border);
 }
 
 .oh-btn-accept,
@@ -406,15 +424,22 @@
   gap: 0.4rem;
   padding: 0.52rem 0.9rem;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--lp-radius);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s ease, transform 0.15s ease;
 }
 
-.oh-btn-accept { background: linear-gradient(135deg, #43c6ac 0%, #2da88f 100%); color: #fff; }
-.oh-btn-reject { background: linear-gradient(135deg, #ff6b8a 0%, #e84a6e 100%); color: #fff; }
+.oh-btn-accept {
+  background: linear-gradient(135deg, var(--lp-success) 0%, #15803D 100%);
+  color: var(--lp-white);
+}
+
+.oh-btn-reject {
+  background: linear-gradient(135deg, var(--lp-error) 0%, #B91C1C 100%);
+  color: var(--lp-white);
+}
 
 .oh-btn-accept:hover:not(:disabled),
 .oh-btn-reject:hover:not(:disabled) {
@@ -428,16 +453,13 @@
   cursor: not-allowed;
 }
 
-/* ── Card header colours ─────────────────────────────────────── */
-.buyer-inq-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-
 /* ── Buyer inquiry — seller reply block ──────────────────────── */
 .oh-seller-reply {
   margin-top: 0.75rem;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, #f0fff4, #e8f5e9);
-  border-radius: 10px;
-  border: 1px solid #a5d6a7;
+  background: #F0FDF4;
+  border-radius: var(--lp-radius);
+  border: 1px solid #86EFAC;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -449,7 +471,7 @@
   align-items: flex-start;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #2e7d32;
+  color: #15803D;
 }
 
 .oh-reply-msg svg,
@@ -466,17 +488,21 @@
   gap: 0.5rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #444;
+  color: var(--lp-black);
   padding: 0.4rem 0.25rem 0.75rem;
-  border-bottom: 2px solid #f0eeff;
+  border-bottom: 2px solid var(--lp-border);
   margin-bottom: 1rem;
 }
 
+.oh-section-heading svg {
+  color: var(--lp-accent);
+}
+
 .oh-section-count {
-  background: #9E7BFF;
-  color: #fff;
+  background: var(--lp-accent);
+  color: var(--lp-white);
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--lp-radius-full);
   font-size: 0.7rem;
   font-weight: 700;
   margin-left: 0.25rem;
@@ -486,14 +512,14 @@
   padding: 1.5rem 1rem !important;
 }
 
-/* ── Alert badge (active count) ──────────────────────────────── */
+/* ── Alert badge (active pending count) ──────────────────────── */
 .badge-alert {
-  background: #ff5252 !important;
-  color: #fff !important;
+  background: var(--lp-error) !important;
+  color: var(--lp-white) !important;
 }
 
 .react-tabs__tab--selected .badge-alert {
-  background: rgba(255,255,255,0.3) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* ── Animations ──────────────────────────────────────────────── */

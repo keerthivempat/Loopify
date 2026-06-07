@@ -8,6 +8,7 @@ const {
   updateItem,
   deleteItem,
   markAsSold,
+  markAsAvailable,
 } = require('../controllers/itemController');
 const { verifyToken } = require('../middleware/authMiddleware');
 
@@ -16,6 +17,7 @@ router.post('/', verifyToken, createItem);
 router.put('/:id', verifyToken, updateItem);
 router.delete('/:id', verifyToken, deleteItem);
 router.patch('/:id/mark-sold', verifyToken, markAsSold);
+router.patch('/:id/mark-available', verifyToken, markAsAvailable);
 router.get('/:id', getItem);
 
 module.exports = router;

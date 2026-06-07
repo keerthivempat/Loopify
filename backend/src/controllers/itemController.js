@@ -2,7 +2,7 @@
 const Item = require('../models/Item');
 const mongoose = require('mongoose');
 
-const getOwnerId = (item) => item.createdBy?.toString() || item.sellerId?.toString();
+const getOwnerId = (item) => item.sellerId?.toString();
 
 const isOwner = (item, userId) => getOwnerId(item) === userId.toString();
 
@@ -50,9 +50,7 @@ const listItems = async (req, res, next) => {
 const getMyListings = async (req, res, next) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id.toString());
-    const items = await Item.find({
-      $or: [{ createdBy: userId }, { sellerId: userId }],
-    })
+    const items = await Item.find({ sellerId: userId })
       .populate('sellerId', 'firstName lastName')
       .sort({ updatedAt: -1 })
       .exec();
@@ -185,6 +183,27 @@ const markAsSold = async (req, res, next) => {
   }
 };
 
+const markAsAvailable = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid item ID' });
+
+    const item = await Item.findById(id);
+    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!isOwner(item, req.user.id)) return res.status(403).json({ message: 'Unauthorized to modify this listing' });
+
+    item.status = 'available';
+    // Restore quantity to at least 1 if it was zeroed out by mark-sold
+    if (!item.stockQuantity || item.stockQuantity < 1) item.stockQuantity = 1;
+    await item.save();
+
+    const populated = await Item.findById(item._id).populate('sellerId', 'firstName lastName');
+    res.json(transformItem(populated));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   listItems,
   getMyListings,
@@ -193,4 +212,5 @@ module.exports = {
   updateItem,
   deleteItem,
   markAsSold,
+  markAsAvailable,
 };

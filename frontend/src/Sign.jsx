@@ -2,41 +2,37 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'animate.css';
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import logo from './assets/logo.png';
+import './Login.css';
 
 const Sign = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    age: '',
-    contactNumber: '',
-    password: '',
-    confirmPassword: ''
+    firstName: '', lastName: '', email: '',
+    age: '', contactNumber: '', password: '', confirmPassword: ''
   });
   const [captchaValue, setCaptchaValue] = useState(null);
+  const [error,      setError]      = useState('');
+  const [success,    setSuccess]    = useState(false);
+  const [loading,    setLoading]    = useState(false);
+  const [showPwd,    setShowPwd]    = useState(false);
+  const [showConfirm,setShowConfirm]= useState(false);
   const navigate = useNavigate();
   const RECAPTCHA_SITE_KEY = "6LcqOssqAAAAAE9ili7h648pENbzfiUVRVi2rVQs";
+
   const handleChange = (e) => {
+    setError('');
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const handleCaptchaChange = (value) => {
-    setCaptchaValue(value);
-  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!captchaValue) {
-      alert('Please complete the reCAPTCHA verification');
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-
+    setError('');
+    if (!captchaValue) { setError('Please complete the reCAPTCHA verification'); return; }
+    if (formData.password !== formData.confirmPassword) { setError('Passwords do not match'); return; }
+    setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/register', {
+      await axios.post('http://localhost:5000/api/register', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -45,164 +41,125 @@ const Sign = () => {
         password: formData.password,
         recaptchaToken: captchaValue
       });
-
-      alert(response.data.message);
-      navigate('/login');
-    } catch (error) {
-      console.log(error);
-      alert(error.response?.data?.message || 'Registration failed');
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 2200);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center py-5" 
-         style={{
-           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-           minHeight: '100vh'
-         }}>
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-6">
-            <div className="card border-0 shadow-lg animate__animated animate__fadeIn">
-              <div className="card-header bg-transparent border-bottom-0 text-center pt-4">
-                <h1 className="text-primary fw-bold mb-3">Create Account</h1>
-                <p className="text-muted">Join our community today!</p>
+    <div className="auth-page">
+      {/* ── Left hero panel ── */}
+      <div className="auth-hero">
+        <div className="auth-hero-inner">
+          <div className="auth-logo">
+            <img src={logo} alt="Loopify" className="auth-logo-img" />
+          </div>
+          <h1 className="auth-hero-title">Your next<br />great find<br />is here</h1>
+          <p className="auth-hero-sub">
+            Join thousands of buyers and sellers in your community. List items in minutes, sell within days.
+          </p>
+          <div className="auth-hero-stats">
+            <div className="auth-stat"><span>Free</span><small>To list</small></div>
+            <div className="auth-stat"><span>Fast</span><small>Delivery</small></div>
+            <div className="auth-stat"><span>Safe</span><small>Payments</small></div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Right form panel ── */}
+      <div className="auth-form-panel">
+        <div className="auth-form-wrap fade-up">
+          <h2 className="auth-form-title">Create account</h2>
+          <p className="auth-form-sub">Join the Loopify community today</p>
+
+          {error && <div className="auth-error">{error}</div>}
+          {success && (
+            <div className="auth-success">
+              <CheckCircle2 size={16} />
+              Account created! Redirecting to sign in…
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-row">
+              <div className="auth-field">
+                <label htmlFor="firstName" className="auth-label">First name</label>
+                <input id="firstName" name="firstName" type="text"
+                  className="lp-input" placeholder="Jane"
+                  value={formData.firstName} onChange={handleChange} required />
               </div>
-              <div className="card-body px-4 py-5">
-                <form onSubmit={handleSubmit} className="animate__animated animate__fadeInUp">
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <div className="form-floating mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="firstName"
-                          name="firstName"
-                          placeholder="First Name"
-                          value={formData.firstName}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="firstName">First Name</label>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="form-floating mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="lastName"
-                          name="lastName"
-                          placeholder="Last Name"
-                          value={formData.lastName}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="lastName">Last Name</label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-floating mb-3">
-                    <input
-                      type="email"
-                      className="form-control"
-                      id="email"
-                      name="email"
-                      placeholder="name@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label htmlFor="email">Email Address</label>
-                  </div>
-
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <div className="form-floating mb-3">
-                        <input
-                          type="number"
-                          className="form-control"
-                          id="age"
-                          name="age"
-                          placeholder="Age"
-                          value={formData.age}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="age">Age</label>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="form-floating mb-3">
-                        <input
-                          type="tel"
-                          className="form-control"
-                          id="contactNumber"
-                          name="contactNumber"
-                          placeholder="Contact Number"
-                          value={formData.contactNumber}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="contactNumber">Contact Number</label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-floating mb-3">
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="password"
-                      name="password"
-                      placeholder="Password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label htmlFor="password">Password</label>
-                  </div>
-
-                  <div className="form-floating mb-4">
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label htmlFor="confirmPassword">Confirm Password</label>
-                  </div>
-                  <div className="mb-4 d-flex justify-content-center">
-                    <ReCAPTCHA
-                      sitekey={RECAPTCHA_SITE_KEY}
-                      onChange={handleCaptchaChange}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn btn-primary w-100 py-3 mb-4 animate__animated animate__pulse animate__infinite"
-                  >
-                    Create Account
-                  </button>
-                </form>
-
-                <div className="text-center animate__animated animate__fadeIn">
-                  <p className="text-muted mb-3">Already have an account?</p>
-                  <button
-                    className="btn btn-outline-primary px-4"
-                    onClick={() => navigate('/login')}
-                  >
-                    Login
-                  </button>
-                </div>
+              <div className="auth-field">
+                <label htmlFor="lastName" className="auth-label">Last name</label>
+                <input id="lastName" name="lastName" type="text"
+                  className="lp-input" placeholder="Doe"
+                  value={formData.lastName} onChange={handleChange} required />
               </div>
             </div>
-          </div>
+
+            <div className="auth-field">
+              <label htmlFor="email" className="auth-label">Email address</label>
+              <input id="email" name="email" type="email"
+                className="lp-input" placeholder="you@example.com"
+                value={formData.email} onChange={handleChange} required />
+            </div>
+
+            <div className="auth-row">
+              <div className="auth-field">
+                <label htmlFor="age" className="auth-label">Age</label>
+                <input id="age" name="age" type="number"
+                  className="lp-input" placeholder="22"
+                  value={formData.age} onChange={handleChange} required />
+              </div>
+              <div className="auth-field">
+                <label htmlFor="contactNumber" className="auth-label">Phone</label>
+                <input id="contactNumber" name="contactNumber" type="tel"
+                  className="lp-input" placeholder="+91 XXXXX XXXXX"
+                  value={formData.contactNumber} onChange={handleChange} required />
+              </div>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="password" className="auth-label">Password</label>
+              <div className="auth-pwd-wrap">
+                <input id="password" name="password" type={showPwd ? 'text' : 'password'}
+                  className="lp-input" placeholder="Min. 8 characters"
+                  value={formData.password} onChange={handleChange} required />
+                <button type="button" className="auth-eye" onClick={() => setShowPwd(!showPwd)} tabIndex={-1}>
+                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="confirmPassword" className="auth-label">Confirm password</label>
+              <div className="auth-pwd-wrap">
+                <input id="confirmPassword" name="confirmPassword"
+                  type={showConfirm ? 'text' : 'password'}
+                  className="lp-input" placeholder="Repeat password"
+                  value={formData.confirmPassword} onChange={handleChange} required />
+                <button type="button" className="auth-eye" onClick={() => setShowConfirm(!showConfirm)} tabIndex={-1}>
+                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={setCaptchaValue} />
+            </div>
+
+            <button type="submit" className="lp-btn lp-btn-primary auth-submit" disabled={loading || success}>
+              {loading ? <span className="auth-spinner" /> : 'Create account'}
+            </button>
+          </form>
+
+          <p className="auth-switch">
+            Already have an account?{' '}
+            <button className="auth-switch-btn" onClick={() => navigate('/login')}>Sign in</button>
+          </p>
         </div>
       </div>
     </div>

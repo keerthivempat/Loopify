@@ -18,7 +18,9 @@ const createInquiry = async (req, res, next) => {
     const item = await Item.findById(itemId);
     if (!item) return res.status(404).json({ message: 'Item not found' });
 
-    const sellerId = (item.createdBy || item.sellerId)?.toString();
+    const sellerId = item.sellerId?.toString();
+    if (!sellerId)
+      return res.status(400).json({ message: 'Item has no seller information' });
     if (sellerId === buyerId.toString())
       return res.status(400).json({ message: 'You cannot send an inquiry for your own listing' });
 

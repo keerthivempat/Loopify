@@ -1,5 +1,6 @@
 // Purpose: Create and configure the Express app, mount routes and middleware
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorMiddleware');
@@ -14,6 +15,8 @@ const orderRoutes = require('./routes/orderRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const inquiryRoutes = require('./routes/inquiryRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const statsRoutes = require('./routes/statsRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 require('dotenv').config();
 
@@ -24,6 +27,7 @@ const app = express();
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // API route mounting
 app.use('/api', authRoutes);
@@ -35,6 +39,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Centralized error handler (should be last middleware)
 app.use(errorHandler);

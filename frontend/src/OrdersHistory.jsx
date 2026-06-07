@@ -12,6 +12,7 @@ import {
 import 'react-tabs/style/react-tabs.css';
 import './OrdersHistory.css';
 
+
 const API = 'http://localhost:5000/api';
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -113,7 +114,7 @@ const OrdersHistory = () => {
   const hideToast = () => setToast(t => ({ ...t, show: false }));
 
   const fetchAll = useCallback(async () => {
-    if (!localStorage.getItem('token')) { navigate('/auth'); return; }
+    if (!localStorage.getItem('token')) { navigate('/'); return; }
     try {
       const [buyerInqRes, sellerInqRes] = await Promise.all([
         axios.get(`${API}/inquiries/buyer`,  { headers: authHeader() }),
@@ -160,7 +161,7 @@ const OrdersHistory = () => {
   ].filter(i => i.status === 'pending').length;
 
   if (loading) return (
-    <div>
+    <div className="lp-page">
       <Navbar />
       <div className="loading-container">
         <div className="oh-spinner-wrap">
@@ -172,7 +173,7 @@ const OrdersHistory = () => {
   );
 
   return (
-    <div>
+    <div className="lp-page">
       <Navbar />
       <Toast show={toast.show} message={toast.message} type={toast.type} onClose={hideToast} />
       <SellerAcceptModal

@@ -1,0 +1,94 @@
+/* ── MyListings page ────────────────────────────── */
+.ml-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.ml-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ml-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.ml-sub { color: var(--lp-muted); font-size: 0.9rem; }
+
+/* ── Success banner ─────────────────────────────── */
+.ml-success-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #15803D;
+  border-radius: var(--lp-radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+}
+.ml-success-banner button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* ── Tab bar ────────────────────────────────────── */
+.ml-tabs-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--lp-border);
+  padding-bottom: 0;
+}
+
+.ml-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--lp-muted);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.ml-tab:hover  { color: var(--lp-black); }
+.ml-tab.active { color: var(--lp-accent); border-bottom-color: var(--lp-accent); }
+
+.ml-tab-count {
+  background: var(--lp-bg);
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-radius-full);
+  padding: 0.05rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--lp-muted);
+}
+.ml-tab.active .ml-tab-count {
+  background: var(--lp-accent-lt);
+  border-color: var(--lp-accent);
+  color: var(--lp-accent);
+}
+
+@media (max-width: 640px) {
+  .ml-header { flex-direction: column; }
+  .ml-container { padding: 1.25rem 1rem 3rem; }
+}

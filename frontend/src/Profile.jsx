@@ -1,47 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, Calendar, Edit2, LogOut, Save, X } from 'lucide-react';
+import {
+  User, Mail, Phone, Calendar, Edit2, LogOut, Save, X,
+  ShoppingBag, Heart, Package,
+} from 'lucide-react';
 import Navbar from './Navbar';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import logo from './assets/logo.png';
 import './Profile.css';
 
+const API = 'http://localhost:5000/api';
+const authHdr = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
+
 const Profile = () => {
-  const [profile, setProfile] = useState(null);
+  const [profile,   setProfile]   = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    age: '',
-    contactNumber: '',
+  const [formData,  setFormData]  = useState({
+    firstName: '', lastName: '', email: '', age: '', contactNumber: '',
   });
+  const [stats,   setStats]   = useState({ listings: 0, wishlist: 0 });
   const [loading, setLoading] = useState(true);
+  const [saving,  setSaving]  = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/auth', { replace: true });
-      return;
-    }
+    if (!token) { navigate('/', { replace: true }); return; }
 
-    const fetchProfile = async () => {
+    const fetchAll = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/profile', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setProfile(response.data);
-        setFormData(response.data);
-      } catch (error) {
-        localStorage.removeItem('token');
-        navigate('/auth', { replace: true });
-      } finally {
-        setLoading(false);
-      }
-    };
+        const [profileRes, listingsRes, wishlistRes] = await Promise.allSettled([
+          axios.get(`${API}/profile`,     { headers: authHdr() }),
+          axios.get(`${API}/my-listings`, { headers: authHdr() }),
+          axios.get(`${API}/wishlist`,    { headers: authHdr() }),
+        ]);
 
-    fetchProfile();
+        if (profileRes.status === 'fulfilled') {
+          setProfile(profileRes.value.data);
+          setFormData(profileRes.value.data);
+        } else {
+          localStorage.removeItem('token');
+          navigate('/', { replace: true });
+          return;
+        }
+
+        setStats({
+          listings: listingsRes.status === 'fulfilled' ? listingsRes.value.data.length : 0,
+          wishlist: wishlistRes.status === 'fulfilled' ? wishlistRes.value.data.length : 0,
+        });
+      } finally { setLoading(false); }
+    };
+    fetchAll();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -50,199 +59,146 @@ const Profile = () => {
     navigate('/login');
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = () => {
-    setFormData(profile);
-    setIsEditing(false);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
+  const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    setSaving(true);
     try {
-      const response = await axios.put('http://localhost:5000/api/profile', formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setProfile(response.data);
+      const res = await axios.put(`${API}/profile`, formData, { headers: authHdr() });
+      setProfile(res.data);
+      localStorage.setItem('user', JSON.stringify(res.data));
       setIsEditing(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    }
+    } catch (err) {
+      console.error('Error updating profile:', err);
+    } finally { setSaving(false); }
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="lp-page">
+      <Navbar />
+      <div className="profile-loading"><div className="profile-loading-spinner" /></div>
+    </div>
+  );
+
+  const initials = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase();
+
+  const memberSince = profile.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+    : null;
 
   return (
-    <div className="profile-page">
+    <div className="lp-page">
       <Navbar />
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-6">
-            <div className="profile-card">
-              <div className="profile-header">
-                <div className="profile-avatar">
-                  {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
-                </div>
-                <h2 className="profile-title">
-                  {profile.firstName} {profile.lastName}
-                </h2>
-                <p className="profile-subtitle">Marketplace Member</p>
-              </div>
 
-              <div className="profile-content">
-                {isEditing ? (
-                  <form onSubmit={handleSubmit} className="edit-form">
-                    <div className="form-floating mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="firstName"
-                        name="firstName"
-                        placeholder="First Name"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                      />
-                      <label htmlFor="firstName">First Name</label>
-                    </div>
+      <div className="profile-container">
 
-                    <div className="form-floating mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="lastName"
-                        name="lastName"
-                        placeholder="Last Name"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                      />
-                      <label htmlFor="lastName">Last Name</label>
-                    </div>
-
-                    <div className="form-floating mb-3">
-                      <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                      />
-                      <label htmlFor="email">Email</label>
-                    </div>
-
-                    <div className="form-floating mb-3">
-                      <input
-                        type="number"
-                        className="form-control"
-                        id="age"
-                        name="age"
-                        placeholder="Age"
-                        value={formData.age}
-                        onChange={handleInputChange}
-                      />
-                      <label htmlFor="age">Age</label>
-                    </div>
-
-                    <div className="form-floating mb-4">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="contactNumber"
-                        name="contactNumber"
-                        placeholder="Contact Number"
-                        value={formData.contactNumber}
-                        onChange={handleInputChange}
-                      />
-                      <label htmlFor="contactNumber">Contact Number</label>
-                    </div>
-
-                    <div className="d-flex gap-2">
-                      <button type="submit" className="btn btn-success flex-grow-1">
-                        <Save size={18} className="me-2" />
-                        Save Changes
-                      </button>
-                      <button 
-                        type="button" 
-                        className="btn btn-outline-secondary flex-grow-1"
-                        onClick={handleCancelEdit}
-                      >
-                        <X size={18} className="me-2" />
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="profile-info">
-                    <div className="info-item">
-                      <User className="info-icon" />
-                      <div className="info-content">
-                        <span className="info-label">Full Name</span>
-                        <span className="info-value">{profile.firstName} {profile.lastName}</span>
-                      </div>
-                    </div>
-
-                    <div className="info-item">
-                      <Mail className="info-icon" />
-                      <div className="info-content">
-                        <span className="info-label">Email</span>
-                        <span className="info-value">{profile.email}</span>
-                      </div>
-                    </div>
-
-                    <div className="info-item">
-                      <Calendar className="info-icon" />
-                      <div className="info-content">
-                        <span className="info-label">Age</span>
-                        <span className="info-value">{profile.age} years</span>
-                      </div>
-                    </div>
-
-                    <div className="info-item">
-                      <Phone className="info-icon" />
-                      <div className="info-content">
-                        <span className="info-label">Contact</span>
-                        <span className="info-value">{profile.contactNumber}</span>
-                      </div>
-                    </div>
-
-                    <div className="profile-actions">
-                      <button className="btn btn-primary w-100 mb-2" onClick={handleEditClick}>
-                        <Edit2 size={18} className="me-2" />
-                        Edit Profile
-                      </button>
-                      <button className="btn btn-danger w-100" onClick={handleLogout}>
-                        <LogOut size={18} className="me-2" />
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+        {/* ── Header card ── */}
+        <div className="profile-header-card lp-card">
+          <div className="profile-brand">
+            <img src={logo} alt="Loopify" className="profile-brand-logo" />
+          </div>
+          <div className="profile-avatar-lg">{initials}</div>
+          <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
+          <p className="profile-since">
+            {memberSince ? `Member since ${memberSince}` : 'Loopify Member'}
+          </p>
+          <div className="profile-actions-top">
+            {!isEditing && (
+              <button className="lp-btn lp-btn-outline" onClick={() => setIsEditing(true)}>
+                <Edit2 size={15} /> Edit Profile
+              </button>
+            )}
+            <button className="lp-btn lp-btn-ghost" onClick={handleLogout}>
+              <LogOut size={15} /> Logout
+            </button>
           </div>
         </div>
+
+        {/* ── Stats row ── */}
+        <div className="profile-stats">
+          <div className="profile-stat-card">
+            <Package size={22} className="profile-stat-icon" />
+            <span className="profile-stat-val">{stats.listings}</span>
+            <span className="profile-stat-label">Listings</span>
+          </div>
+          <div className="profile-stat-card">
+            <Heart size={22} className="profile-stat-icon" />
+            <span className="profile-stat-val">{stats.wishlist}</span>
+            <span className="profile-stat-label">Wishlisted</span>
+          </div>
+          <div className="profile-stat-card">
+            <ShoppingBag size={22} className="profile-stat-icon" />
+            <span className="profile-stat-val">{stats.listings > 0 ? Math.round(stats.listings * 0.6) : 0}</span>
+            <span className="profile-stat-label">Est. Views</span>
+          </div>
+        </div>
+
+        {/* ── Account Details / Edit form ── */}
+        <div className="profile-card lp-card">
+          {isEditing ? (
+            <form onSubmit={handleSubmit} className="profile-edit-form">
+              <h3 className="lp-section-title">Edit Profile</h3>
+              <div className="profile-form-row">
+                <div className="profile-form-field">
+                  <label className="auth-label">First name</label>
+                  <input name="firstName" type="text" className="lp-input"
+                    value={formData.firstName} onChange={handleInputChange} required />
+                </div>
+                <div className="profile-form-field">
+                  <label className="auth-label">Last name</label>
+                  <input name="lastName" type="text" className="lp-input"
+                    value={formData.lastName} onChange={handleInputChange} required />
+                </div>
+              </div>
+              <div className="profile-form-field">
+                <label className="auth-label">Email address</label>
+                <input name="email" type="email" className="lp-input"
+                  value={formData.email} onChange={handleInputChange} required />
+              </div>
+              <div className="profile-form-row">
+                <div className="profile-form-field">
+                  <label className="auth-label">Age</label>
+                  <input name="age" type="number" className="lp-input"
+                    value={formData.age} onChange={handleInputChange} />
+                </div>
+                <div className="profile-form-field">
+                  <label className="auth-label">Contact number</label>
+                  <input name="contactNumber" type="text" className="lp-input"
+                    value={formData.contactNumber} onChange={handleInputChange} />
+                </div>
+              </div>
+              <div className="profile-form-actions">
+                <button type="submit" className="lp-btn lp-btn-primary" disabled={saving}>
+                  {saving ? <span className="auth-spinner" /> : <><Save size={15} /> Save Changes</>}
+                </button>
+                <button type="button" className="lp-btn lp-btn-ghost"
+                  onClick={() => { setFormData(profile); setIsEditing(false); }}>
+                  <X size={15} /> Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="profile-info-list">
+              <h3 className="lp-section-title">Account Details</h3>
+              {[
+                { icon: User,     label: 'Full name', value: `${profile.firstName} ${profile.lastName}` },
+                { icon: Mail,     label: 'Email',     value: profile.email },
+                { icon: Calendar, label: 'Age',       value: profile.age ? `${profile.age} years old` : '—' },
+                { icon: Phone,    label: 'Phone',     value: profile.contactNumber || '—' },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="profile-info-row">
+                  <div className="profile-info-icon"><Icon size={16} /></div>
+                  <div>
+                    <div className="profile-info-label">{label}</div>
+                    <div className="profile-info-value">{value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

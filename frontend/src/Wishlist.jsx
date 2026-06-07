@@ -5,69 +5,70 @@ import Navbar from './Navbar';
 import ListingCard from './components/ListingCard';
 import Toast from './components/Toast';
 import { API_BASE, getAuthHeaders } from './utils/api';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './SearchItems.css';
 
 const Wishlist = () => {
-  const [items, setItems] = useState([]);
+  const [items,   setItems]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
-  const showToast = (message, type = 'success') => setToast({ show: true, message, type });
-  const hideToast = () => setToast((t) => ({ ...t, show: false }));
-
-  const fetchWishlist = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${API_BASE}/wishlist`, { headers: getAuthHeaders() });
-      setItems(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.error('Error fetching wishlist:', error);
-      setItems([]);
-      showToast('Failed to load wishlist', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const showToast = (msg, type = 'success') => setToast({ show: true, message: msg, type });
+  const hideToast = () => setToast(t => ({ ...t, show: false }));
 
   useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/wishlist`, { headers: getAuthHeaders() });
+        setItems(Array.isArray(res.data) ? res.data : []);
+      } catch {
+        showToast('Failed to load wishlist', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchWishlist();
   }, []);
 
   const handleRemoveFromWishlist = async (item) => {
+    if (!window.confirm(`Remove "${item.name}" from your wishlist?`)) return;
     try {
       await axios.delete(`${API_BASE}/wishlist/${item._id}`, { headers: getAuthHeaders() });
-      setItems((prev) => prev.filter((i) => i._id !== item._id));
+      setItems(prev => prev.filter(i => i._id !== item._id));
       showToast('Removed from wishlist');
-    } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to remove from wishlist', 'error');
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to remove from wishlist', 'error');
     }
   };
 
   return (
-    <div className="min-vh-100 bg-light">
+    <div className="lp-page">
       <Navbar />
       <Toast show={toast.show} message={toast.message} type={toast.type} onClose={hideToast} />
 
-      <div className="container py-5">
-        <div className="browse-header mb-4">
-          <div className="d-flex align-items-center gap-2">
-            <Heart size={28} className="text-danger" />
-            <h2 className="browse-title mb-0">Wishlist</h2>
+      <div className="browse-container">
+        <div className="wishlist-header">
+          <div className="wishlist-heading">
+            <Heart size={26} className="wishlist-icon" />
+            <h1>Wishlist</h1>
           </div>
-          <p className="text-muted mb-0 mt-1">Items you&apos;ve saved for later</p>
+          <p className="wishlist-sub">Items you've saved for later</p>
         </div>
 
-        <div className="row">
-          {loading ? (
-            <div className="col-12 text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+        {loading ? (
+          <div className="lp-listings-grid">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="lp-skeleton-card">
+                <div className="skeleton lp-skeleton-img" />
+                <div className="lp-skeleton-body">
+                  <div className="skeleton lp-skeleton-line w-full" />
+                  <div className="skeleton lp-skeleton-line w-60" />
+                </div>
               </div>
-              <p className="text-muted mt-2">Loading wishlist...</p>
-            </div>
-          ) : items.length > 0 ? (
-            items.map((item) => (
+            ))}
+          </div>
+        ) : items.length > 0 ? (
+          <div className="lp-listings-grid">
+            {items.map(item => (
               <ListingCard
                 key={item._id}
                 item={item}
@@ -75,14 +76,15 @@ const Wishlist = () => {
                 showStatusBadge
                 onRemoveFromWishlist={handleRemoveFromWishlist}
               />
-            ))
-          ) : (
-            <div className="col-12 text-center py-5">
-              <Heart size={48} className="text-muted mb-3" />
-              <p className="text-muted">Your wishlist is empty. Browse listings and save items you like!</p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="lp-empty">
+            <Heart size={56} />
+            <h3>Your wishlist is empty</h3>
+            <p>Browse listings and heart items you like to save them here</p>
+          </div>
+        )}
       </div>
     </div>
   );

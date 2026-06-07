@@ -1,46 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { CheckCircle2, XCircle, X } from 'lucide-react';
+import './Toast.css';
 
-const Toast = ({ show, message, type = 'success', onClose }) => {
-  const toastRef = useRef(null);
-
+const Toast = ({ show, message, type = 'success', onClose, duration = 3500 }) => {
   useEffect(() => {
-    if (!show || !toastRef.current) return;
+    if (show) {
+      const t = setTimeout(onClose, duration);
+      return () => clearTimeout(t);
+    }
+  }, [show, duration, onClose]);
 
-    const toast = new bootstrap.Toast(toastRef.current, { delay: 3000 });
-    const handleHidden = () => onClose?.();
-    toastRef.current.addEventListener('hidden.bs.toast', handleHidden);
-    toast.show();
-
-    return () => {
-      toastRef.current?.removeEventListener('hidden.bs.toast', handleHidden);
-    };
-  }, [show, message, type, onClose]);
-
-  const bgClass = type === 'error' ? 'bg-danger' : 'bg-success';
-  const icon = type === 'error' ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill';
+  if (!show) return null;
 
   return (
-    <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1055 }}>
-      <div
-        ref={toastRef}
-        className={`toast align-items-center text-white ${bgClass} border-0`}
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div className="d-flex">
-          <div className="toast-body">
-            <i className={`bi ${icon} me-2`} />
-            {message}
-          </div>
-          <button
-            type="button"
-            className="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          />
-        </div>
+    <div className={`lp-toast lp-toast-${type}`} role="alert">
+      <div className="lp-toast-icon">
+        {type === 'success' ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
       </div>
+      <span className="lp-toast-msg">{message}</span>
+      <button className="lp-toast-close" onClick={onClose} aria-label="Close">
+        <X size={15} />
+      </button>
     </div>
   );
 };

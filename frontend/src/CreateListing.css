@@ -1,0 +1,178 @@
+/* ── Create / Edit Listing page ─────────────────── */
+.cl-container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.cl-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--lp-muted);
+  text-decoration: none;
+  margin-bottom: 1.25rem;
+  transition: color 0.15s;
+}
+.cl-back:hover { color: var(--lp-accent); }
+
+.cl-card { overflow: hidden; }
+
+.cl-card-header {
+  padding: 1.75rem 1.75rem 0;
+  border-bottom: 1px solid var(--lp-border);
+  padding-bottom: 1.25rem;
+  margin-bottom: 0;
+}
+
+.cl-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--lp-black);
+  margin-bottom: 0.2rem;
+}
+
+.cl-sub {
+  font-size: 0.875rem;
+  color: var(--lp-muted);
+  margin: 0;
+}
+
+.cl-card-body { padding: 1.75rem; }
+
+/* skeleton for edit loading */
+.cl-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+.cl-skeleton-line {
+  height: 44px;
+  border-radius: var(--lp-radius);
+}
+
+@media (max-width: 640px) {
+  .cl-container     { padding: 1.25rem 1rem 3rem; }
+  .cl-card-header   { padding: 1.25rem 1.25rem 1rem; }
+  .cl-card-body     { padding: 1.25rem; }
+}
+
+/* ── Image upload widget ─────────────────────────── */
+.lf-upload-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lp-muted);
+  margin-bottom: 0.6rem;
+}
+
+/* Dropzone */
+.lf-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1.5rem;
+  border: 2px dashed var(--lp-border);
+  border-radius: var(--lp-radius);
+  background: var(--lp-surface);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.lf-dropzone:hover,
+.lf-dropzone--active {
+  border-color: var(--lp-accent);
+  background: color-mix(in srgb, var(--lp-accent) 6%, transparent);
+}
+.lf-dropzone-icon {
+  color: var(--lp-muted);
+  transition: color 0.2s;
+}
+.lf-dropzone:hover .lf-dropzone-icon,
+.lf-dropzone--active .lf-dropzone-icon {
+  color: var(--lp-accent);
+}
+.lf-dropzone-text {
+  font-size: 0.9rem;
+  color: var(--lp-black);
+  margin: 0;
+  text-align: center;
+}
+.lf-dropzone-link {
+  color: var(--lp-accent);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.lf-dropzone-hint {
+  font-size: 0.78rem;
+  color: var(--lp-muted);
+  margin: 0;
+}
+
+/* Preview */
+.lf-preview-wrap {
+  position: relative;
+  border-radius: var(--lp-radius);
+  overflow: hidden;
+  border: 1px solid var(--lp-border);
+  background: #000;
+}
+.lf-preview-img {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  opacity: 0.92;
+}
+.lf-preview-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.lf-preview-remove:hover { background: rgba(220,38,38,0.85); }
+
+.lf-preview-change {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.lf-preview-change:hover { background: rgba(0,0,0,0.75); }
+
+/* Error */
+.lf-upload-error {
+  font-size: 0.82rem;
+  color: #dc2626;
+  margin: 0.4rem 0 0;
+}
+
