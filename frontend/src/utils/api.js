@@ -1,4 +1,4 @@
-export const API_BASE = 'http://localhost:5000/api';
+export const API_BASE = 'https://loopify-pl69.onrender.com/api';
 
 export const getAuthHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,

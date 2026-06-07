@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 import Toast from './components/Toast';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://loopify-pl69.onrender.com/api';
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 const MyCart = () => {

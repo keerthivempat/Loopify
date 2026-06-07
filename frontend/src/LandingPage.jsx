@@ -78,7 +78,7 @@ const LandingPage = () => {
 
   /* fetch live stats from public endpoint */
   useEffect(() => {
-    fetch('http://localhost:5000/api/stats')
+    fetch('https://loopify-pl69.onrender.com/api/stats')
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => setLiveStats({
         listings:       data.listings      ?? 0,

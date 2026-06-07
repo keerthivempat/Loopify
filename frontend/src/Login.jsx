@@ -14,7 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/stats')
+    fetch('https://loopify-pl69.onrender.com/api/stats')
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => setStats({
         listings:       data.listings      ?? null,
@@ -36,7 +36,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:5000/api/login', formData);
+      const response = await axios.post('https://loopify-pl69.onrender.com/api/login', formData);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/browse-listings');
