@@ -28,7 +28,7 @@ const app = express();
 apapp.use(cors({
   origin: true,
   credentials: true
-}));
+}));  
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
