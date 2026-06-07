@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
+
 import axios from 'axios';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import logo from './assets/logo.png';
@@ -11,14 +11,12 @@ const Sign = () => {
     firstName: '', lastName: '', email: '',
     age: '', contactNumber: '', password: '', confirmPassword: ''
   });
-  const [captchaValue, setCaptchaValue] = useState(null);
   const [error,      setError]      = useState('');
   const [success,    setSuccess]    = useState(false);
   const [loading,    setLoading]    = useState(false);
   const [showPwd,    setShowPwd]    = useState(false);
   const [showConfirm,setShowConfirm]= useState(false);
   const navigate = useNavigate();
-  const RECAPTCHA_SITE_KEY = "6LcqOssqAAAAAE9ili7h648pENbzfiUVRVi2rVQs";
 
   const handleChange = (e) => {
     setError('');
@@ -28,7 +26,6 @@ const Sign = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!captchaValue) { setError('Please complete the reCAPTCHA verification'); return; }
     if (formData.password !== formData.confirmPassword) { setError('Passwords do not match'); return; }
     setLoading(true);
     try {
@@ -38,8 +35,7 @@ const Sign = () => {
         email: formData.email,
         age: formData.age,
         contactNumber: formData.contactNumber,
-        password: formData.password,
-        recaptchaToken: captchaValue
+        password: formData.password
       });
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2200);
@@ -147,9 +143,7 @@ const Sign = () => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={setCaptchaValue} />
-            </div>
+
 
             <button type="submit" className="lp-btn lp-btn-primary auth-submit" disabled={loading || success}>
               {loading ? <span className="auth-spinner" /> : 'Create account'}

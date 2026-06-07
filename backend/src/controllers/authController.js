@@ -2,15 +2,13 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { hashPassword, comparePassword } = require('../services/authService');
-const { verifyRecaptcha } = require('../middleware/recaptchaMiddleware');
+
 
 require('dotenv').config();
 
 const register = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, age, contactNumber, password, recaptchaToken } = req.body;
-    const isValidCaptcha = await verifyRecaptcha(recaptchaToken);
-    if (!isValidCaptcha) return res.status(400).json({ message: 'Invalid reCAPTCHA' });
+    const { firstName, lastName, email, age, contactNumber, password } = req.body;
 
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'User already exists' });
