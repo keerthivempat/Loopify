@@ -1,4 +1,4 @@
-# Loopify - Second-Hand Marketplace
+# Loopify - AI-Powered Sustainable Marketplace
 
 Loopify is a modern, responsive, full-stack second-hand marketplace application built using the MERN stack (MongoDB, Express, React, Node.js). It allows users to list items for sale, browse listings, manage a shopping cart, place orders, and communicate directly with sellers — all powered by an AI assistant.
 
@@ -127,9 +127,3 @@ The `POST /api/ai/chat` endpoint powers the Loopify AI widget. It:
 4. Falls back through multiple Gemini models (`gemini-2.5-flash` → `gemini-2.0-flash-lite` → ...) on quota/503 errors
 5. Falls back to rule-based responses if all LLM calls fail — so the widget never shows a hard error
 
-## Contributing
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
