@@ -13,7 +13,7 @@ import 'react-tabs/style/react-tabs.css';
 import './OrdersHistory.css';
 
 
-const API = 'https://loopify-pl69.onrender.com/api';
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 

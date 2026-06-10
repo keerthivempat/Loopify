@@ -78,7 +78,7 @@ const LandingPage = () => {
 
   /* fetch live stats from public endpoint */
   useEffect(() => {
-    fetch('https://loopify-pl69.onrender.com/api/stats')
+    fetch(`${import.meta.env.VITE_API_BASE || 'http://localhost:5000/api'}/stats`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => setLiveStats({
         listings:       data.listings      ?? 0,

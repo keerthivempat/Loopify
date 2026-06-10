@@ -16,6 +16,7 @@ import ItemDetails from './ItemDetails';
 import MyCart from './MyCart';
 import DeliverItems from './DeliverItems';
 import OrdersHistory from './OrdersHistory';
+import AIChatWidget from './components/AIChatWidget';
 
 /* Redirect authenticated users away from public-only pages */
 const PublicRoute = ({ children }) => {
@@ -154,6 +155,9 @@ function App() {
         {/* ── Catch-all ── */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* ── Loopify AI floating assistant (persists across all pages) ── */}
+      <AIChatWidget />
     </Router>
   );
 }

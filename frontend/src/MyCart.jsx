@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 import Toast from './components/Toast';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const API = 'https://loopify-pl69.onrender.com/api';
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 const MyCart = () => {

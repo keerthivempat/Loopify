@@ -29,7 +29,7 @@ const Sign = () => {
     if (formData.password !== formData.confirmPassword) { setError('Passwords do not match'); return; }
     setLoading(true);
     try {
-      await axios.post('https://loopify-pl69.onrender.com/api/register', {
+      await axios.post(`${import.meta.env.VITE_API_BASE || 'http://localhost:5000/api'}/register`, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
